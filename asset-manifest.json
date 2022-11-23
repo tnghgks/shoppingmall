@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.js": "/shoppingmall/static/js/main.18390ad2.js",
+    "main.js": "/shoppingmall/static/js/main.d8718568.js",
     "static/media/icon-shopping-cart-white.svg": "/shoppingmall/static/media/icon-shopping-cart-white.441d73e268955e0e16f25fa56bcbaf72.svg",
     "static/media/icon-heart-on.svg": "/shoppingmall/static/media/icon-heart-on.0f6bbd4903724c3c16387efb41f92a03.svg",
     "static/media/icon-heart.svg": "/shoppingmall/static/media/icon-heart.f68a21bc77488dac8c34b7650d1237ab.svg",
     "index.html": "/shoppingmall/index.html",
-    "main.18390ad2.js.map": "/shoppingmall/static/js/main.18390ad2.js.map"
+    "main.d8718568.js.map": "/shoppingmall/static/js/main.d8718568.js.map"
   },
   "entrypoints": [
-    "static/js/main.18390ad2.js"
+    "static/js/main.d8718568.js"
   ]
 }
