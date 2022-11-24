@@ -1,5 +1,6 @@
 import Card from "../../components/Card/Card";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import styled from "styled-components";
 import shoppingCartIcon from "../../assets/icon-shopping-cart-white.svg";
@@ -40,14 +41,14 @@ const Home = () => {
 
   const getProductData = () => {
     axios
-      .get("http://35.76.53.28:8080/mall")
+      .get("https://test.api.weniv.co.kr/mall")
       .then((res) => setProductData(res.data))
       .catch((error) => console.log(error));
   };
 
   const getCouponData = () => {
     axios
-      .get("http://35.76.53.28:8080/coupon")
+      .get("https://test.api.weniv.co.kr/coupon")
       .then((res) => setCouponData(res.data))
       .catch((error) => console.log(error));
   };
@@ -62,7 +63,6 @@ const Home = () => {
       <Section>
         {productData.map((product) => {
           const coupon = couponData.filter((coupon) => coupon.productid === product.id);
-
           if (!!coupon.length) {
             return <Card productData={product} key={product.id} couponData={coupon} />;
           } else {
@@ -71,7 +71,9 @@ const Home = () => {
         })}
       </Section>
       <ShoppingCart>
-        <img src={shoppingCartIcon} alt="쇼핑카트아이콘" />
+        <Link to="cartpage">
+          <img src={shoppingCartIcon} alt="쇼핑카트아이콘" />
+        </Link>
       </ShoppingCart>
     </Container>
   );
