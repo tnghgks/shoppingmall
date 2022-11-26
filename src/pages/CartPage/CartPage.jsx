@@ -1,18 +1,36 @@
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 import CouponSelect from "../../components/CouponSelect/CouponSelect";
 import ShoppingCart from "../../components/ShoppingCart/ShoppingCart";
+import iconHome from "../../assets/icon-home.png";
 
 const Container = styled.main`
+  position: relative;
   width: 1260px;
   margin: 160px auto;
   display: flex;
   flex-direction: column;
 `;
 const Title = styled.h1`
+  margin-bottom: 60px;
   font-weight: 700;
   font-size: 36px;
   line-height: 44px;
   text-align: center;
+`;
+const HomeBtn = styled(Link)`
+  position: absolute;
+  right: -140px;
+  width: 80px;
+  height: 80px;
+  background: #6327fe;
+  border-radius: 80px;
+  img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
 `;
 const SubTitle = styled.h2`
   font-size: 24px;
@@ -48,6 +66,9 @@ const CartPage = () => {
   return (
     <Container>
       <Title>장바구니/결제</Title>
+      <HomeBtn to="/">
+        <img src={iconHome} alt="홈 버튼" />
+      </HomeBtn>
       <Section>
         <SubTitle>쿠폰 사용</SubTitle>
         <Hr />

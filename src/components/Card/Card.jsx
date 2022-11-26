@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { Link } from "react-router-dom";
 import ProductImage from "./ProductImage/ProductImage";
 import ProductName from "./ProductName/ProductName";
 import ProductPrice from "./ProductPrice/ProductPrice";
@@ -42,16 +43,18 @@ const Card = ({ productData, couponData }) => {
   }
   return (
     <Container>
-      <ProductImage ProductThumbnail={productData.thumbnailImg} isSold={!productData.stockCount} />
-      <InfoContainer>
-        <ProductInfo>
-          <ProductName productName={productData.productName} />
-          <PriceContainer>
-            <ProductPrice productPrice={productData.price} discount={discount} />
-          </PriceContainer>
-        </ProductInfo>
-        <Like isLike={isLike} />
-      </InfoContainer>
+      <Link to={`//productDetail/${productData.id}`}>
+        <ProductImage ProductThumbnail={productData.thumbnailImg} isSold={!productData.stockCount} />
+        <InfoContainer>
+          <ProductInfo>
+            <ProductName productName={productData.productName} />
+            <PriceContainer>
+              <ProductPrice productPrice={productData.price} discount={discount} />
+            </PriceContainer>
+          </ProductInfo>
+          <Like isLike={isLike} />
+        </InfoContainer>
+      </Link>
     </Container>
   );
 };
