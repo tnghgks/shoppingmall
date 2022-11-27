@@ -12,3 +12,9 @@ export const getCouponData = () =>
     .get("https://test.api.weniv.co.kr/coupon")
     .then((res) => res.data)
     .catch((error) => console.log(error));
+
+export const getProductDetail = (id) =>
+  axios
+    .get(`http://test.api.weniv.co.kr/mall/${id}`)
+    .then((res) => res.data)
+    .catch((error) => console.log(error));

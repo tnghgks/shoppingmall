@@ -45,16 +45,18 @@ const Card = ({ productData, couponData }) => {
     <Container>
       <Link to={`//productDetail/${productData.id}`}>
         <ProductImage ProductThumbnail={productData.thumbnailImg} isSold={!productData.stockCount} />
-        <InfoContainer>
-          <ProductInfo>
+      </Link>
+      <InfoContainer>
+        <ProductInfo>
+          <Link to={`//productDetail/${productData.id}`}>
             <ProductName productName={productData.productName} />
             <PriceContainer>
               <ProductPrice productPrice={productData.price} discount={discount} />
             </PriceContainer>
-          </ProductInfo>
-          <Like isLike={isLike} />
-        </InfoContainer>
-      </Link>
+          </Link>
+        </ProductInfo>
+        <Like isLike={isLike} />
+      </InfoContainer>
     </Container>
   );
 };
