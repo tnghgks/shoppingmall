@@ -50,7 +50,7 @@ const Option = ({ option, price, setPickOptions, setTotalAmount }) => {
 
   useEffect(() => {
     option.amount = amount;
-    option.pirce = amount * (price + additionalFee);
+    option.price = amount * (price + additionalFee);
     setOptionPrice(amount * (price + additionalFee));
   }, [amount]);
 
@@ -65,7 +65,7 @@ const Option = ({ option, price, setPickOptions, setTotalAmount }) => {
         <DeleteBtn src={deleteIcon} onClick={handleDeleteBtn} />
       </Division>
       <Division>
-        <ChangeAmountBtn amount={amount} setAmount={setAmount} />
+        <ChangeAmountBtn amount={amount} setAmount={setAmount} setTotalAmount={setTotalAmount} />
         <Price>{optionPrice.toLocaleString()}</Price>
       </Division>
     </Container>

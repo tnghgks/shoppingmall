@@ -121,10 +121,11 @@ const LikeBtn = styled.button`
 `;
 
 const PurchaseInfo = ({ productData }) => {
-  const [totalAmount, setTotalAmount] = useState(1);
+  const optionList = productData.option;
+  const [totalAmount, setTotalAmount] = useState(0);
+  const [amount, setAmount] = useState(productData.option.length ? 0 : 1);
   const [totalPrice, setTotalPrice] = useState(0);
   const [pickOptions, setPickOptions] = useState([]);
-  const optionList = productData.option;
 
   const onChangeHandler = (event) => {
     setPickOptions((prev) => {
@@ -135,15 +136,31 @@ const PurchaseInfo = ({ productData }) => {
       }
       return prev;
     });
+    setTotalAmount(() => {
+      const totalAmount = pickOptions.reduce((acc, cur) => acc + cur.amount, 0);
+      return totalAmount + amount;
+    });
   };
 
   useEffect(() => {
+    setTotalAmount(() => {
+      const totalAmount = pickOptions.reduce((acc, cur) => acc + cur.amount, 0);
+      return totalAmount + amount;
+    });
+
     setTotalPrice(() => {
-      const totalPrice = pickOptions.reduce((acc, cur) => acc + cur.price, 0);
-      console.log(totalPrice);
-      return totalAmount * productData.price + productData.shippingFee;
+      const totalPrice = pickOptions.reduce((acc, cur) => {
+        return acc + cur.price;
+      }, 0);
+      return amount * productData.price + productData.shippingFee + totalPrice;
     });
   }, [totalAmount]);
+
+  useEffect(() => {
+    setTotalAmount(0);
+
+    setTotalPrice(productData.price + productData.shippingFee);
+  }, []);
 
   return (
     <BuyProductContainer>
@@ -162,12 +179,12 @@ const PurchaseInfo = ({ productData }) => {
                 ))}
             </>
           ) : (
-            <ChangeAmountBtn amount={totalAmount} setAmount={setTotalAmount} />
+            <ChangeAmountBtn amount={amount} setAmount={setAmount} setTotalAmount={setTotalAmount} />
           )}
           <Hr />
           <TotalProductPrice>
             <PriceLabel>총 상품 금액</PriceLabel>
-            <TotalAmount>총 수량 {totalAmount}개</TotalAmount>
+            <TotalAmount>총 수량 {totalAmount === 0 ? 1 : totalAmount}개</TotalAmount>
             <FinalPrice>{totalPrice.toLocaleString()}</FinalPrice>
           </TotalProductPrice>
           <InteractiveBtns>

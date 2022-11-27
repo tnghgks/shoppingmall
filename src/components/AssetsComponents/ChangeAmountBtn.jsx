@@ -33,13 +33,15 @@ const PlusBtn = styled.button`
   cursor: pointer;
 `;
 
-const ChangeAmountBtn = ({ amount, setAmount }) => {
+const ChangeAmountBtn = ({ amount, setAmount, setTotalAmount }) => {
   const handlePlusBtn = () => {
     setAmount((prev) => prev + 1);
+    setTotalAmount((prev) => prev + 1);
   };
   const handleMinusBtn = () => {
     if (amount === 1) return;
     setAmount((prev) => prev - 1);
+    setTotalAmount((prev) => prev - 1);
   };
   return (
     <Container>
