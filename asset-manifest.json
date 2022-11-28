@@ -1,6 +1,6 @@
 {
   "files": {
-    "main.js": "/shoppingmall/static/js/main.36e4295e.js",
+    "main.js": "/shoppingmall/static/js/main.5a2b1d9b.js",
     "static/media/icon-shopping-cart-white.svg": "/shoppingmall/static/media/icon-shopping-cart-white.441d73e268955e0e16f25fa56bcbaf72.svg",
     "static/media/icon-shopping-cart.svg": "/shoppingmall/static/media/icon-shopping-cart.909bd7a386e439bf8c64725421fe7391.svg",
     "static/media/icon-heart-on.svg": "/shoppingmall/static/media/icon-heart-on.0f6bbd4903724c3c16387efb41f92a03.svg",
@@ -9,9 +9,9 @@
     "static/media/icon-delete.svg": "/shoppingmall/static/media/icon-delete.a1802f3ea52a11c7a4b090a7155c63fa.svg",
     "static/media/icon-plus-line.svg": "/shoppingmall/static/media/icon-plus-line.ae6a390a05ad93e1a3c78520638f8ca3.svg",
     "static/media/icon-minus-line.svg": "/shoppingmall/static/media/icon-minus-line.d33dd167120440c5a0c23e15d2dd8048.svg",
-    "main.36e4295e.js.map": "/shoppingmall/static/js/main.36e4295e.js.map"
+    "main.5a2b1d9b.js.map": "/shoppingmall/static/js/main.5a2b1d9b.js.map"
   },
   "entrypoints": [
-    "static/js/main.36e4295e.js"
+    "static/js/main.5a2b1d9b.js"
   ]
 }
