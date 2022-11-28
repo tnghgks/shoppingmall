@@ -51,7 +51,7 @@ const Home = ({ productProps: { isProductLoading, productData, isCouponLoading, 
           <Loader>Loading...</Loader>
         ) : (
           productData?.map((product) => {
-            const coupon = couponData.filter((coupon) => coupon.productid === product.id);
+            const coupon = couponData?.filter((coupon) => coupon.productid === product.id);
             return <Card productData={product} key={product.id} couponData={coupon} />;
           })
         )}
