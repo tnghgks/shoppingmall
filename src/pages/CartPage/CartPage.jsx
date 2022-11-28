@@ -77,9 +77,6 @@ const CartPage = ({ couponData }) => {
     });
   };
 
-  useEffect(() => {
-    console.log(selected);
-  }, [selected]);
   return (
     <Container>
       <Title>장바구니/결제</Title>

@@ -210,7 +210,6 @@ const PurchaseInfo = ({ productData }) => {
     );
     navigate("/cartpage");
   };
-  console.log(productData.discountRate);
   return (
     <BuyProductContainer>
       <ProductName>{productData.productName}</ProductName>
