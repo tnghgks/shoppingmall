@@ -1,7 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 import deleteIcon from "../../assets/icon-delete.svg";
-import Selector from "../AssetsComponents/Selector";
 
 const Container = styled.ul`
   width: 600px;
@@ -32,24 +31,63 @@ const CouponItem = styled.li`
 const DeleteBtn = styled.img`
   cursor: pointer;
 `;
+const Selector = styled.select`
+  width: 100%;
+  border: 1px solid #bdbdbd;
+  border-radius: 5px;
+  color: #828282;
+  font-size: 14px;
+  line-height: 18px;
+  padding: 11px 14px;
+  option {
+    background: #ffffff;
+    font-size: 14px;
+    line-height: 18px;
+    &:hover {
+      background: #f8f5ff;
+      border-radius: 5px;
+    }
+  }
+`;
 
-const CouponSelect = () => {
+const CouponSelect = ({ couponData }) => {
   const [value, setValue] = useState(0);
-  const onChangeHandler = (event) => {
-    setValue(event.target.value);
+  const [selected, setSeleted] = useState([]);
+  const onChangeHandler = ({ target }) => {
+    const inputValue = target.value;
+    setValue(inputValue);
+    if (selected.find((select) => select === inputValue)) return;
+    setSeleted((prev) => [...prev, inputValue]);
   };
+
+  const handleDeleteBtn = ({ target }) => {
+    setSeleted((prev) => [...prev.filter((selectedItem) => !(selectedItem === target.dataset.id))]);
+  };
+
   return (
     <Container>
-      <Selector value={value} onChange={onChangeHandler} />
+      <Selector defaultValue={value} onChange={onChangeHandler}>
+        <option value="0" disabled>
+          쿠폰 선택
+        </option>
+        {couponData &&
+          couponData.map((coupon) => (
+            <option key={coupon.id} value={coupon.id}>
+              {coupon.couponName}
+            </option>
+          ))}
+      </Selector>
       <CouponList>
-        <CouponItem>
-          <span>Hack Your Life 개발자 노트북 파우치 2,000원 할인 쿠폰</span>
-          <DeleteBtn src={deleteIcon} />
-        </CouponItem>
-        <CouponItem>
-          <span>Hack Your Life 개발자 노트북 파우치 배송비 무료 쿠폰</span>
-          <DeleteBtn src={deleteIcon} />
-        </CouponItem>
+        {selected &&
+          selected.map((couponId) => {
+            const { couponName } = couponData.find((item) => item.id === parseInt(couponId));
+            return (
+              <CouponItem value={couponId} key={couponId}>
+                <span>{couponName}</span>
+                <DeleteBtn src={deleteIcon} data-id={couponId} onClick={handleDeleteBtn} />
+              </CouponItem>
+            );
+          })}
       </CouponList>
     </Container>
   );

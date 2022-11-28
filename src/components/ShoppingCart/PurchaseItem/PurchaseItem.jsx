@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import IconCheckBox from "../../AssetsComponents/IconCheckBox";
+import ProductPrice from "../../Card/ProductPrice/ProductPrice";
 
 const Container = styled.li`
   margin-top: 16px;
@@ -26,14 +27,17 @@ const ProductInfo = styled.div`
   flex-direction: column;
   margin-left: 36px;
 `;
-const ProductName = styled.p`
+const ItemName = styled.p`
   font-size: 18px;
   line-height: 22px;
 `;
-const ProductPrice = styled.span`
+const ItemPrice = styled.span`
+  display: flex;
+  align-items: center;
+  gap: 10px;
   margin-top: 8px;
 `;
-const ProductOption = styled.span`
+const ItemOption = styled.span`
   margin-top: 13px;
 `;
 const CouponDiscount = styled.div`
@@ -72,22 +76,23 @@ const PurchasePrice = styled.div`
   margin-left: 155px;
   color: #333333;
 `;
-const PurchaseItem = () => {
+const PurchaseItem = ({ purchaseItem: { id, productName, cost, price, shippingFee, discountRate, thumbnailImg, couponData, amount = 1 }, allSelected, appendSelected }) => {
+  const finalPrice = amount * (Math.floor((price - price * (discountRate * 0.01)) / 1000) * 1000) + shippingFee;
   return (
     <Container>
-      <IconCheckBox />
-      <ProductImage></ProductImage>
+      <IconCheckBox allSelected={allSelected} appendSelected={appendSelected} cartId={id} />
+      <ProductImage src={`https://test.api.weniv.co.kr/${thumbnailImg}`} />
       <ProductInfo>
-        <ProductName>Hack Your Life 개발자 노트북 파우치</ProductName>
-        <ProductPrice>29,000원</ProductPrice>
-        <ProductOption>옵션 : 13인치(수량 : 1개) / 15인치(수량 : 1개)</ProductOption>
+        <ItemName>{productName}</ItemName>
+        <ItemPrice>{discountRate ? <ProductPrice productPrice={cost} discountRate={discountRate} /> : `${cost.toLocaleString()} 원`}</ItemPrice>
+        <ItemOption>옵션 : 13인치(수량 : 1개) / 15인치(수량 : 1개)</ItemOption>
       </ProductInfo>
       <CouponDiscount>
-        <CouponName>Hack Your Life 개발자 노트북입니다</CouponName>
-        <CouponPrice>-2,000원</CouponPrice>
+        <CouponName>{couponData ? couponData.name : "-"}</CouponName>
+        <CouponPrice>{couponData ? couponData.price : "-"}</CouponPrice>
       </CouponDiscount>
-      <DeliveryFee>무료배송</DeliveryFee>
-      <PurchasePrice>27,000원</PurchasePrice>
+      <DeliveryFee>{shippingFee ? `${shippingFee} 원` : "무료 배송"}</DeliveryFee>
+      <PurchasePrice>{`${price.toLocaleString()} 원`}</PurchasePrice>
     </Container>
   );
 };

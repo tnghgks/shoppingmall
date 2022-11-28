@@ -9,7 +9,7 @@ const Router = ({ productProps }) => {
       <BrowserRouter basename="/shoppingmall">
         <Routes>
           <Route path="/" element={<Home productProps={productProps} />} />
-          <Route path="/cartpage" element={<CartPage productProps={productProps} />} />
+          <Route path="/cartpage" element={<CartPage couponData={productProps.couponData} />} />
           <Route path="/productDetail/:id" element={<ProductDetailPage productProps={productProps} />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

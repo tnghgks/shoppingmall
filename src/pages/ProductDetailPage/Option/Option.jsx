@@ -37,10 +37,11 @@ const Price = styled.span`
 const DeleteBtn = styled.img`
   cursor: pointer;
 `;
-const Option = ({ option, price, setPickOptions, setTotalAmount }) => {
+const Option = ({ option, price, setPickOptions, setTotalAmount, discountRate }) => {
   const { additionalFee, optionName } = option;
   const [amount, setAmount] = useState(1);
   const [optionPrice, setOptionPrice] = useState(0);
+  const discountedPrice = Math.floor((price - price * (discountRate * 0.01)) / 1000) * 1000;
 
   const handleDeleteBtn = () => {
     setPickOptions((prev) => {
@@ -50,12 +51,12 @@ const Option = ({ option, price, setPickOptions, setTotalAmount }) => {
 
   useEffect(() => {
     option.amount = amount;
-    option.price = amount * (price + additionalFee);
-    setOptionPrice(amount * (price + additionalFee));
+    option.price = amount * (discountedPrice + additionalFee);
+    setOptionPrice(amount * (discountedPrice + additionalFee));
   }, [amount]);
 
   useEffect(() => {
-    setOptionPrice(price + additionalFee);
+    setOptionPrice(discountedPrice + additionalFee);
   }, []);
 
   return (

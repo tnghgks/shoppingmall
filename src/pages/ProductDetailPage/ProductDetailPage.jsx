@@ -45,10 +45,9 @@ const ProductAmount = styled.span`
   width: 100%;
   font-size: 14px;
   line-height: 18px;
-  border-top: 2px solid#E0E0E0;
+  border-top: 2px solid #e0e0e0;
   border-bottom: 2px solid #e0e0e0;
   display: flex;
-
   div {
     padding: 13px 12px;
     width: 285px;

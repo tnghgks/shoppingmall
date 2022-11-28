@@ -4,6 +4,7 @@ import reset from "styled-reset";
 import { ReactQueryDevtools } from "react-query/devtools";
 import { getProductData, getCouponData } from "./api/api";
 import { useQuery } from "react-query";
+import { useEffect } from "react";
 
 const GlobalStyle = createGlobalStyle`
 ${reset}
@@ -27,6 +28,11 @@ function App() {
     productData,
     couponData,
   };
+
+  if (!(isProductLoading && isCouponLoading)) {
+    localStorage.setItem("cartData", JSON.stringify(productData));
+  }
+
   return (
     <>
       <GlobalStyle />

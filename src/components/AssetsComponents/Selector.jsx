@@ -12,7 +12,7 @@ const SelectContainer = styled.select`
 
 const Select = ({ value = 0, onChangeHandler, optionData }) => {
   return (
-    <SelectContainer value={value} onChange={onChangeHandler}>
+    <SelectContainer defaultValue={value} onChange={onChangeHandler}>
       <option value="0" disabled>
         쿠폰 선택
       </option>

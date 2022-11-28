@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import IconShoppingCart from "../../../assets/icon-shopping-cart.png";
 import IconDisabledCart from "../../../assets/icon-shopping-cart.svg";
@@ -7,6 +8,8 @@ import IconHeartOn from "../../../assets/icon-heart-on.svg";
 import Selector from "../../../components/AssetsComponents/Selector";
 import ChangeAmountBtn from "../../../components/AssetsComponents/ChangeAmountBtn";
 import Option from "../Option/Option";
+import ToggleCart from "../ToggleCart/ToggleCart";
+import ProductPrice from "../../../components/Card/ProductPrice/ProductPrice";
 
 const BuyProductContainer = styled.section`
   display: flex;
@@ -19,17 +22,14 @@ const ProductName = styled.span`
   font-size: 24px;
   line-height: 30px;
 `;
-const ProductPrice = styled.span`
-  font-weight: 700;
-  font-size: 24px;
-  line-height: 30px;
+const PriceContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
   margin-top: 10px;
-  &::after {
-    content: "원";
-    font-weight: 400;
-    font-size: 16px;
-    line-height: 20px;
-    margin-left: 2px;
+  span:last-child {
+    font-size: 24px;
+    line-height: 30px;
   }
 `;
 const DeliveryFee = styled.span`
@@ -86,10 +86,12 @@ const FinalPrice = styled.span`
 `;
 
 const InteractiveBtns = styled.div`
+  position: relative;
   display: flex;
   gap: 6px;
   margin-top: ${(props) => (props.soldout ? "auto" : "0")};
 `;
+
 const BuyBtn = styled.button`
   width: 308px;
   font-weight: 700;
@@ -103,6 +105,7 @@ const BuyBtn = styled.button`
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   cursor: pointer;
 `;
+
 const AddToCartBtn = styled.button`
   width: 60px;
   height: 60px;
@@ -110,7 +113,9 @@ const AddToCartBtn = styled.button`
   background: ${(props) => (props.soldout ? "#BDBDBD" : "#ffffff")};
   cursor: pointer;
   border-radius: 5px;
+  position: relative;
 `;
+
 const LikeBtn = styled.button`
   width: 60px;
   height: 60px;
@@ -121,11 +126,14 @@ const LikeBtn = styled.button`
 `;
 
 const PurchaseInfo = ({ productData }) => {
+  const navigate = useNavigate();
   const optionList = productData.option;
+  const discountedPrice = productData.discountRate ? Math.floor((productData.price - productData.price * (productData.discountRate * 0.01)) / 1000) * 1000 : productData.price;
   const [totalAmount, setTotalAmount] = useState(0);
   const [amount, setAmount] = useState(productData.option.length ? 0 : 1);
   const [totalPrice, setTotalPrice] = useState(0);
   const [pickOptions, setPickOptions] = useState([]);
+  const [toggle, setToggle] = useState(false);
 
   const onChangeHandler = (event) => {
     setPickOptions((prev) => {
@@ -142,6 +150,27 @@ const PurchaseInfo = ({ productData }) => {
     });
   };
 
+  const ToggleCartBtn = () => {
+    setToggle((prev) => !prev);
+    JSON.parse(localStorage.getItem("cartData"));
+    localStorage.setItem(
+      "cartData",
+      JSON.stringify([
+        {
+          id: productData.id,
+          productName: productData.productName,
+          cost: productData.price,
+          price: totalPrice,
+          shippingFee: productData.shippingFee,
+          discountRate: productData.discountRate,
+          thumbnailImg: productData.thumbnailImg,
+          couponData: productData.couponData,
+          amount: totalAmount,
+        },
+      ])
+    );
+  };
+
   useEffect(() => {
     setTotalAmount(() => {
       const totalAmount = pickOptions.reduce((acc, cur) => acc + cur.amount, 0);
@@ -152,20 +181,42 @@ const PurchaseInfo = ({ productData }) => {
       const totalPrice = pickOptions.reduce((acc, cur) => {
         return acc + cur.price;
       }, 0);
-      return amount * productData.price + productData.shippingFee + totalPrice;
+
+      return amount * discountedPrice + productData.shippingFee + totalPrice;
     });
   }, [totalAmount]);
 
   useEffect(() => {
     setTotalAmount(0);
 
-    setTotalPrice(productData.price + productData.shippingFee);
+    setTotalPrice(discountedPrice + productData.shippingFee);
   }, []);
-
+  const handleBuyBtn = () => {
+    localStorage.setItem(
+      "cartData",
+      JSON.stringify([
+        {
+          id: productData.id,
+          productName: productData.productName,
+          cost: productData.price,
+          price: totalPrice,
+          shippingFee: productData.shippingFee,
+          discountRate: productData.discountRate,
+          thumbnailImg: productData.thumbnailImg,
+          couponData: productData.couponData,
+          amount: totalAmount,
+        },
+      ])
+    );
+    navigate("/cartpage");
+  };
+  console.log(productData.discountRate);
   return (
     <BuyProductContainer>
       <ProductName>{productData.productName}</ProductName>
-      <ProductPrice>{productData.price.toLocaleString()}</ProductPrice>
+      <PriceContainer>
+        <ProductPrice productPrice={productData.price} discountRate={productData.discountRate}></ProductPrice>
+      </PriceContainer>
       {productData.stockCount ? (
         <>
           <DeliveryFee>{productData.shippingFee ? `배송비 ${productData.shippingFee.toLocaleString()} 원` : "택배배송 / 무료배송"}</DeliveryFee>
@@ -175,7 +226,14 @@ const PurchaseInfo = ({ productData }) => {
               <Selector onChangeHandler={onChangeHandler} optionData={productData.option} />
               {pickOptions &&
                 pickOptions.map((option, index) => (
-                  <Option key={index} option={option} price={productData.price} setPickOptions={setPickOptions} setTotalAmount={setTotalAmount} />
+                  <Option
+                    key={index}
+                    option={option}
+                    price={productData.price}
+                    setPickOptions={setPickOptions}
+                    setTotalAmount={setTotalAmount}
+                    discountRate={productData.discountRate}
+                  />
                 ))}
             </>
           ) : (
@@ -188,10 +246,11 @@ const PurchaseInfo = ({ productData }) => {
             <FinalPrice>{totalPrice.toLocaleString()}</FinalPrice>
           </TotalProductPrice>
           <InteractiveBtns>
-            <BuyBtn>바로 구매</BuyBtn>
-            <AddToCartBtn>
+            <BuyBtn onClick={handleBuyBtn}>바로 구매</BuyBtn>
+            <AddToCartBtn onClick={ToggleCartBtn}>
               <img src={IconShoppingCart} alt="장바구니 버튼" />
             </AddToCartBtn>
+            <ToggleCart toggle={toggle} setToggle={setToggle} />
             <LikeBtn>
               <img src={IconHeart} alt="좋아요 버튼" />
             </LikeBtn>

@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import CouponSelect from "../../components/CouponSelect/CouponSelect";
@@ -45,7 +46,6 @@ const Hr = styled.div`
   height: 2px;
   background: #e0e0e0;
 `;
-
 const DeleteBtn = styled.button`
   display: block;
   width: 130px;
@@ -60,9 +60,26 @@ const DeleteBtn = styled.button`
   padding: 10px 0px;
   margin-top: 16px;
   margin-left: auto;
+  margin-bottom: 16px;
   cursor: pointer;
 `;
-const CartPage = () => {
+
+const CartPage = ({ couponData }) => {
+  const [selected, setSelected] = useState([]);
+
+  const handleDeleteBtn = () => {
+    console.log("딜리트");
+  };
+  const appendSelected = (cartId) => {
+    setSelected((prev) => {
+      if (selected.includes(cartId)) return [...selected.filter((item) => !(item === cartId))];
+      return [...prev, cartId];
+    });
+  };
+
+  useEffect(() => {
+    console.log(selected);
+  }, [selected]);
   return (
     <Container>
       <Title>장바구니/결제</Title>
@@ -72,13 +89,13 @@ const CartPage = () => {
       <Section>
         <SubTitle>쿠폰 사용</SubTitle>
         <Hr />
-        <CouponSelect />
+        <CouponSelect couponData={couponData} />
       </Section>
       <Section>
         <SubTitle>주문 상품</SubTitle>
         <Hr />
-        <DeleteBtn>선택 삭제하기</DeleteBtn>
-        <ShoppingCart></ShoppingCart>
+        <DeleteBtn onClick={handleDeleteBtn}>선택 삭제하기</DeleteBtn>
+        <ShoppingCart appendSelected={appendSelected}></ShoppingCart>
       </Section>
     </Container>
   );

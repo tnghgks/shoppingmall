@@ -1,15 +1,16 @@
 import styled from "styled-components";
 import PurchaseItem from "./PurchaseItem/PurchaseItem";
-import IconCheckBox from "../AssetsComponents/IconCheckBox";
+import checkBoxOn from "../../assets/icon-check-box-ON.png";
+import checkBoxOff from "../../assets/icon-check-box-OFF.png";
 import minusBtn from "../../assets/minus-icon_2.png";
 import plusBtn from "../../assets/plus-icon_2.png";
+import { useEffect, useState } from "react";
 
 const Container = styled.section`
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 16px;
 `;
 
 const Header = styled.header`
@@ -124,45 +125,62 @@ const PurchaseBtn = styled.button`
   margin-top: 60px;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 `;
+const AllCheckBox = styled.button`
+  width: 16px;
+  height: 16px;
+  margin-left: 20px;
+  border-radius: 2px;
+  border: none;
+  background-image: url(${(props) => (props.toggle ? checkBoxOn : checkBoxOff)});
+`;
 
-const ShoppingCart = () => {
+const ShoppingCart = ({ appendSelected }) => {
+  const cartData = JSON.parse(localStorage.getItem("cartData"));
+  const [allSelected, setAllSelected] = useState(false);
+  const totalPrice = cartData.reduce((acc, cur) => acc + cur.price, 0);
+  const totalCouponPrice = cartData.reduce((acc, cur) => acc + cur.shippingFee, 0);
+  const deliveryFee = cartData.reduce((acc, cur) => acc + cur.shippingFee, 0);
+  const ExpectedPrice = totalPrice - totalCouponPrice + deliveryFee;
+
+  const handleAllSelected = () => {
+    setAllSelected((prev) => !prev);
+  };
+
   return (
     <Container>
       <H3>상품 정보</H3>
       <Header>
-        <IconCheckBox />
+        <AllCheckBox toggle={allSelected} onClick={handleAllSelected} />
         <ColumnName leftMargin="264px">상품정보</ColumnName>
         <ColumnName leftMargin="302px">쿠폰 할인</ColumnName>
         <ColumnName leftMargin="162px">배송비</ColumnName>
         <ColumnName leftMargin="163px">주문금액</ColumnName>
       </Header>
       <PurchaseList>
-        <PurchaseItem></PurchaseItem>
-        <PurchaseItem></PurchaseItem>
-        <PurchaseItem></PurchaseItem>
+        {cartData && cartData.map((purchaseItem) => <PurchaseItem key={purchaseItem.id} purchaseItem={purchaseItem} allSelected={allSelected} appendSelected={appendSelected} />)}
       </PurchaseList>
       <PriceInfo>
         <InfoItem leftMargin="112px">
           <span>총 상품금액</span>
-          <span>57,500</span>
+          <span>{totalPrice.toLocaleString()}</span>
         </InfoItem>
         <MinusIcon>
           <img src={minusBtn} alt="" />
         </MinusIcon>
         <InfoItem leftMargin="96px">
           <span>쿠폰 할인</span>
-          <span>9,000</span>
+          <span>{totalCouponPrice.toLocaleString()}</span>
         </InfoItem>
         <PlusIcon>
           <img src={plusBtn} alt="" />
         </PlusIcon>
         <InfoItem leftMargin="122px">
           <span>배송비</span>
-          <span>0</span>
+          <span>{deliveryFee.toLocaleString()}</span>
         </InfoItem>
         <WillPayment>
           <span>결제 예정 금액</span>
-          <span>46,500</span>
+          <span>{ExpectedPrice.toLocaleString()}</span>
         </WillPayment>
       </PriceInfo>
       <PurchaseBtn>선택 상품 주문하기</PurchaseBtn>

@@ -37,21 +37,18 @@ const PriceContainer = styled.div`
 
 const Card = ({ productData, couponData }) => {
   const isLike = false;
-  let discount;
-  if (couponData) {
-    discount = couponData.reduce((acc, cur) => cur.discount + acc, 0);
-  }
+
   return (
     <Container>
-      <Link to={`//productDetail/${productData.id}`}>
+      <Link to={`/productDetail/${productData.id}`}>
         <ProductImage ProductThumbnail={productData.thumbnailImg} isSold={!productData.stockCount} />
       </Link>
       <InfoContainer>
         <ProductInfo>
-          <Link to={`//productDetail/${productData.id}`}>
+          <Link to={`/productDetail/${productData.id}`}>
             <ProductName productName={productData.productName} />
             <PriceContainer>
-              <ProductPrice productPrice={productData.price} discount={discount} />
+              <ProductPrice productPrice={productData.price} discountRate={productData.discountRate} />
             </PriceContainer>
           </Link>
         </ProductInfo>

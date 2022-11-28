@@ -29,14 +29,14 @@ const DiscountRate = styled.span`
   color: #6327fe;
 `;
 
-const ProductPrice = ({ productPrice, discount = 0 }) => {
+const ProductPrice = ({ productPrice, discountRate = 0 }) => {
   const cost = productPrice.toLocaleString();
-  const price = (productPrice - discount).toLocaleString();
-  const discountRate = Math.floor((discount / productPrice) * 100);
+  const discountedPrice = discountRate ? Math.floor((productPrice - productPrice * (discountRate * 0.01)) / 1000) * 1000 : productPrice;
+
   return (
     <>
-      <Price>{price}</Price>
-      {!!discount && (
+      <Price>{discountedPrice.toLocaleString()}</Price>
+      {!!discountRate && (
         <>
           <Cost>{cost}</Cost>
           <DiscountRate>{discountRate}%</DiscountRate>
