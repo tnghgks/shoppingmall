@@ -34,7 +34,7 @@ function App() {
       localStorage.setItem("cartData", "[]");
     }
   }
-
+  console.log(couponData);
   return (
     <>
       <GlobalStyle />

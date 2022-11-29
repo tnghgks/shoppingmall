@@ -50,18 +50,21 @@ const Selector = styled.select`
   }
 `;
 
-const CouponSelect = ({ couponData }) => {
+const CouponSelect = ({ couponData, setCoupon }) => {
   const [value, setValue] = useState(0);
   const [selected, setSeleted] = useState([]);
+
   const onChangeHandler = ({ target }) => {
     const inputValue = target.value;
     setValue(inputValue);
     if (selected.find((select) => select === inputValue)) return;
     setSeleted((prev) => [...prev, inputValue]);
+    setCoupon([...selected]);
   };
 
   const handleDeleteBtn = ({ target }) => {
     setSeleted((prev) => [...prev.filter((selectedItem) => !(selectedItem === target.dataset.id))]);
+    setCoupon([...selected]);
   };
 
   return (

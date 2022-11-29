@@ -66,7 +66,7 @@ const DeleteBtn = styled.button`
 
 const CartPage = ({ couponData }) => {
   const [selected, setSelected] = useState([]);
-
+  const [coupon, setCoupon] = useState([]);
   const handleDeleteBtn = () => {
     console.log("딜리트");
   };
@@ -76,7 +76,7 @@ const CartPage = ({ couponData }) => {
       return [...prev, cartId];
     });
   };
-
+  console.log(coupon);
   return (
     <Container>
       <Title>장바구니/결제</Title>
@@ -86,7 +86,7 @@ const CartPage = ({ couponData }) => {
       <Section>
         <SubTitle>쿠폰 사용</SubTitle>
         <Hr />
-        <CouponSelect couponData={couponData} />
+        <CouponSelect couponData={couponData} setCoupon={setCoupon} />
       </Section>
       <Section>
         <SubTitle>주문 상품</SubTitle>

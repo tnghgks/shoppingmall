@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { Link } from "react-router-dom";
 import IconCheckBox from "../../AssetsComponents/IconCheckBox";
 import ProductPrice from "../../Card/ProductPrice/ProductPrice";
 
@@ -82,7 +83,9 @@ const PurchaseItem = ({ purchaseItem, allSelected, appendSelected }) => {
       <IconCheckBox allSelected={allSelected} appendSelected={appendSelected} cartId={purchaseItem.id} />
       <ProductImage src={`https://test.api.weniv.co.kr/${purchaseItem.thumbnailImg}`} />
       <ProductInfo>
-        <ItemName>{purchaseItem.productName}</ItemName>
+        <ItemName>
+          <Link to={`/productDetail/${purchaseItem.id}`}>{purchaseItem.productName}</Link>
+        </ItemName>
         <ItemPrice>
           {purchaseItem.discountRate ? <ProductPrice productPrice={purchaseItem.price} discountRate={purchaseItem.discountRate} /> : `${purchaseItem.price.toLocaleString()} 원`}
         </ItemPrice>
