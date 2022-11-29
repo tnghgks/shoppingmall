@@ -76,7 +76,7 @@ const PurchasePrice = styled.div`
   margin-left: 155px;
   color: #333333;
 `;
-const PurchaseItem = ({ purchaseItem: { id, productName, cost, price, shippingFee, discountRate, thumbnailImg, couponData, amount = 1 }, allSelected, appendSelected }) => {
+const PurchaseItem = ({ purchaseItem: { id, productName, price, shippingFee, discountRate, thumbnailImg, couponData, amount = 1 }, allSelected, appendSelected }) => {
   const finalPrice = amount * (Math.floor((price - price * (discountRate * 0.01)) / 1000) * 1000) + shippingFee;
   return (
     <Container>
@@ -84,15 +84,15 @@ const PurchaseItem = ({ purchaseItem: { id, productName, cost, price, shippingFe
       <ProductImage src={`https://test.api.weniv.co.kr/${thumbnailImg}`} />
       <ProductInfo>
         <ItemName>{productName}</ItemName>
-        <ItemPrice>{discountRate ? <ProductPrice productPrice={cost} discountRate={discountRate} /> : `${cost.toLocaleString()} 원`}</ItemPrice>
-        <ItemOption>옵션 : 13인치(수량 : 1개) / 15인치(수량 : 1개)</ItemOption>
+        <ItemPrice>{discountRate ? <ProductPrice productPrice={price} discountRate={discountRate} /> : `${finalPrice.toLocaleString()} 원`}</ItemPrice>
+        <ItemOption>수량 : {amount}</ItemOption>
       </ProductInfo>
       <CouponDiscount>
         <CouponName>{couponData ? couponData.name : "-"}</CouponName>
         <CouponPrice>{couponData ? couponData.price : "-"}</CouponPrice>
       </CouponDiscount>
       <DeliveryFee>{shippingFee ? `${shippingFee} 원` : "무료 배송"}</DeliveryFee>
-      <PurchasePrice>{`${price.toLocaleString()} 원`}</PurchasePrice>
+      <PurchasePrice>{`${(price + shippingFee).toLocaleString()} 원`}</PurchasePrice>
     </Container>
   );
 };

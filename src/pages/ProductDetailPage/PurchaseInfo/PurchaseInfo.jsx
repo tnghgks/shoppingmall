@@ -192,13 +192,14 @@ const PurchaseInfo = ({ productData }) => {
     setTotalPrice(discountedPrice + productData.shippingFee);
   }, []);
   const handleBuyBtn = () => {
+    const prev = JSON.parse(localStorage.getItem("cartData"));
     localStorage.setItem(
       "cartData",
       JSON.stringify([
+        ...prev,
         {
           id: productData.id,
           productName: productData.productName,
-          cost: productData.price,
           price: totalPrice,
           shippingFee: productData.shippingFee,
           discountRate: productData.discountRate,
