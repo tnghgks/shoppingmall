@@ -1,7 +1,8 @@
+import { useContext, useEffect, useState } from "react";
+import styled from "styled-components";
 import ChangeAmountBtn from "../../../components/AssetsComponents/ChangeAmountBtn";
 import deleteIcon from "../../../assets/icon-delete.svg";
-import styled from "styled-components";
-import { useEffect, useState } from "react";
+import { PurchaseContext } from "../PurchaseInfo/PurchaseInfo";
 
 const Container = styled.div`
   width: 100%;
@@ -37,13 +38,24 @@ const Price = styled.span`
 const DeleteBtn = styled.img`
   cursor: pointer;
 `;
-const Option = ({ option, price, setPickOptions, setTotalAmount, discountRate }) => {
+const Option = ({ option, productData, setPickOptions, setTotalAmount }) => {
+  const { selectInfo, setSelectInfo } = useContext(PurchaseContext);
+  const price = productData.price;
+  const discountRate = productData.discountRate;
   const { additionalFee, optionName } = option;
+  const finalPrice = discountRate ? Math.floor((price - price * (discountRate * 0.01)) / 1000) * 1000 + additionalFee : price + additionalFee;
+
   const [amount, setAmount] = useState(1);
   const [optionPrice, setOptionPrice] = useState(0);
-  const discountedPrice = Math.floor((price - price * (discountRate * 0.01)) / 1000) * 1000;
 
   const handleDeleteBtn = () => {
+    setSelectInfo((prev) => {
+      const optionItem = prev.findIndex((item) => item.id === productData.id && item.optionName === option.optionName);
+      if (optionItem || optionItem === 0) {
+        prev.splice(optionItem, 1);
+      }
+      return [...prev];
+    });
     setPickOptions((prev) => {
       return [...prev.filter((item) => !(item.optionName === optionName))];
     });
@@ -51,12 +63,37 @@ const Option = ({ option, price, setPickOptions, setTotalAmount, discountRate })
 
   useEffect(() => {
     option.amount = amount;
-    option.price = amount * (discountedPrice + additionalFee);
-    setOptionPrice(amount * (discountedPrice + additionalFee));
+    option.price = amount * finalPrice;
+    setOptionPrice(amount * finalPrice);
+    setSelectInfo((prev) => {
+      const optionItem = prev.find((item) => item.id === productData.id && item.optionName === option.optionName);
+      if (optionItem) {
+        optionItem.amount = amount;
+        optionItem.totalPrice = finalPrice * amount;
+        console.log(optionItem);
+      }
+      return [...prev];
+    });
   }, [amount]);
 
   useEffect(() => {
-    setOptionPrice(discountedPrice + additionalFee);
+    setOptionPrice(finalPrice);
+    setSelectInfo((prev) => [
+      ...prev,
+      {
+        id: productData.id,
+        productName: productData.productName,
+        cost: productData.price,
+        price: finalPrice,
+        shippingFee: productData.shippingFee,
+        discountRate: productData.discountRate,
+        thumbnailImg: productData.thumbnailImg,
+        totalPrice: finalPrice * amount,
+        optionName: option.optionName,
+        couponData: [],
+        amount: 1,
+      },
+    ]);
   }, []);
 
   return (

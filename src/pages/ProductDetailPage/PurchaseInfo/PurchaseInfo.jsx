@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { createContext, useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import IconShoppingCart from "../../../assets/icon-shopping-cart.png";
@@ -124,13 +124,20 @@ const LikeBtn = styled.button`
   cursor: pointer;
   border-radius: 5px;
 `;
+export const PurchaseContext = createContext({
+  selectInfo: [],
+  setSelectInfo: () => {},
+});
 
 const PurchaseInfo = ({ productData }) => {
   const navigate = useNavigate();
+  const [selectInfo, setSelectInfo] = useState([]);
+  const value = useMemo(() => ({ selectInfo, setSelectInfo }), [selectInfo]);
+  console.log(selectInfo);
   const optionList = productData.option;
   const discountedPrice = productData.discountRate ? Math.floor((productData.price - productData.price * (productData.discountRate * 0.01)) / 1000) * 1000 : productData.price;
   const [totalAmount, setTotalAmount] = useState(0);
-  const [amount, setAmount] = useState(productData.option.length ? 0 : 1);
+  const [amount, setAmount] = useState(1);
   const [totalPrice, setTotalPrice] = useState(0);
   const [pickOptions, setPickOptions] = useState([]);
   const [toggle, setToggle] = useState(false);
@@ -187,6 +194,35 @@ const PurchaseInfo = ({ productData }) => {
   }, [totalAmount]);
 
   useEffect(() => {
+    setSelectInfo((prev) => {
+      const optionItem = prev.find((item) => item.id === productData.id && item.optionName === "original");
+      if (optionItem) {
+        optionItem.amount = amount;
+        optionItem.totalPrice = discountedPrice * amount + productData.shippingFee;
+      }
+      return [...prev];
+    });
+  }, [amount]);
+
+  useEffect(() => {
+    setSelectInfo((prev) => [
+      ...prev,
+      {
+        id: productData.id,
+        productName: productData.productName,
+        cost: productData.price,
+        price: discountedPrice,
+        shippingFee: productData.shippingFee,
+        discountRate: productData.discountRate,
+        thumbnailImg: productData.thumbnailImg,
+        totalPrice: discountedPrice * amount + productData.shippingFee,
+        optionName: "original",
+        couponData: [],
+        amount: 1,
+      },
+    ]);
+  }, []);
+  useEffect(() => {
     setTotalAmount(0);
 
     setTotalPrice(discountedPrice + productData.shippingFee);
@@ -212,66 +248,61 @@ const PurchaseInfo = ({ productData }) => {
     navigate("/cartpage");
   };
   return (
-    <BuyProductContainer>
-      <ProductName>{productData.productName}</ProductName>
-      <PriceContainer>
-        <ProductPrice productPrice={productData.price} discountRate={productData.discountRate}></ProductPrice>
-      </PriceContainer>
-      {productData.stockCount ? (
-        <>
-          <DeliveryFee>{productData.shippingFee ? `배송비 ${productData.shippingFee.toLocaleString()} 원` : "택배배송 / 무료배송"}</DeliveryFee>
-          <Hr />
-          {!!productData.option.length ? (
-            <>
-              <Selector onChangeHandler={onChangeHandler} optionData={productData.option} />
-              {pickOptions &&
-                pickOptions.map((option, index) => (
-                  <Option
-                    key={index}
-                    option={option}
-                    price={productData.price}
-                    setPickOptions={setPickOptions}
-                    setTotalAmount={setTotalAmount}
-                    discountRate={productData.discountRate}
-                  />
-                ))}
-            </>
-          ) : (
-            <ChangeAmountBtn amount={amount} setAmount={setAmount} setTotalAmount={setTotalAmount} />
-          )}
-          <Hr />
-          <TotalProductPrice>
-            <PriceLabel>총 상품 금액</PriceLabel>
-            <TotalAmount>총 수량 {totalAmount === 0 ? 1 : totalAmount}개</TotalAmount>
-            <FinalPrice>{totalPrice.toLocaleString()}</FinalPrice>
-          </TotalProductPrice>
-          <InteractiveBtns>
-            <BuyBtn onClick={handleBuyBtn}>바로 구매</BuyBtn>
-            <AddToCartBtn onClick={ToggleCartBtn}>
-              <img src={IconShoppingCart} alt="장바구니 버튼" />
-            </AddToCartBtn>
-            <ToggleCart toggle={toggle} setToggle={setToggle} />
-            <LikeBtn>
-              <img src={IconHeart} alt="좋아요 버튼" />
-            </LikeBtn>
-          </InteractiveBtns>
-        </>
-      ) : (
-        <>
-          <InteractiveBtns soldout={true}>
-            <BuyBtn soldout={true} disabled>
-              품절된 상품입니다.
-            </BuyBtn>
-            <AddToCartBtn soldout={true} disabled>
-              <img src={IconDisabledCart} alt="장바구니 버튼" />
-            </AddToCartBtn>
-            <LikeBtn>
-              <img src={IconHeart} alt="좋아요 버튼" />
-            </LikeBtn>
-          </InteractiveBtns>
-        </>
-      )}
-    </BuyProductContainer>
+    <PurchaseContext.Provider value={value}>
+      <BuyProductContainer>
+        <ProductName>{productData.productName}</ProductName>
+        <PriceContainer>
+          <ProductPrice productPrice={productData.price} discountRate={productData.discountRate}></ProductPrice>
+        </PriceContainer>
+        {productData.stockCount ? (
+          <>
+            <DeliveryFee>{productData.shippingFee ? `배송비 ${productData.shippingFee.toLocaleString()} 원` : "택배배송 / 무료배송"}</DeliveryFee>
+            <Hr />
+            {!!productData.option.length ? (
+              <>
+                <Selector onChangeHandler={onChangeHandler} optionData={productData.option} />
+                {pickOptions &&
+                  pickOptions.map((option, index) => (
+                    <Option key={index} option={option} productData={productData} setPickOptions={setPickOptions} setTotalAmount={setTotalAmount} />
+                  ))}
+              </>
+            ) : (
+              <ChangeAmountBtn amount={amount} setAmount={setAmount} setTotalAmount={setTotalAmount} />
+            )}
+            <Hr />
+            <TotalProductPrice>
+              <PriceLabel>총 상품 금액</PriceLabel>
+              <TotalAmount>총 수량 {totalAmount === 0 ? 1 : totalAmount}개</TotalAmount>
+              <FinalPrice>{totalPrice.toLocaleString()}</FinalPrice>
+            </TotalProductPrice>
+            <InteractiveBtns>
+              <BuyBtn onClick={handleBuyBtn}>바로 구매</BuyBtn>
+              <AddToCartBtn onClick={ToggleCartBtn}>
+                <img src={IconShoppingCart} alt="장바구니 버튼" />
+              </AddToCartBtn>
+              <ToggleCart toggle={toggle} setToggle={setToggle} />
+              <LikeBtn>
+                <img src={IconHeart} alt="좋아요 버튼" />
+              </LikeBtn>
+            </InteractiveBtns>
+          </>
+        ) : (
+          <>
+            <InteractiveBtns soldout={true}>
+              <BuyBtn soldout={true} disabled>
+                품절된 상품입니다.
+              </BuyBtn>
+              <AddToCartBtn soldout={true} disabled>
+                <img src={IconDisabledCart} alt="장바구니 버튼" />
+              </AddToCartBtn>
+              <LikeBtn>
+                <img src={IconHeart} alt="좋아요 버튼" />
+              </LikeBtn>
+            </InteractiveBtns>
+          </>
+        )}
+      </BuyProductContainer>
+    </PurchaseContext.Provider>
   );
 };
 
