@@ -132,76 +132,29 @@ export const PurchaseContext = createContext({
 const PurchaseInfo = ({ productData }) => {
   const navigate = useNavigate();
   const [selectInfo, setSelectInfo] = useState([]);
-  const value = useMemo(() => ({ selectInfo, setSelectInfo }), [selectInfo]);
-  console.log(selectInfo);
-  const optionList = productData.option;
-  const discountedPrice = productData.discountRate ? Math.floor((productData.price - productData.price * (productData.discountRate * 0.01)) / 1000) * 1000 : productData.price;
-  const [totalAmount, setTotalAmount] = useState(0);
   const [amount, setAmount] = useState(1);
-  const [totalPrice, setTotalPrice] = useState(0);
-  const [pickOptions, setPickOptions] = useState([]);
   const [toggle, setToggle] = useState(false);
+  const value = useMemo(() => ({ selectInfo, setSelectInfo }), [selectInfo]);
+  const totalAmount = selectInfo.reduce((acc, cur) => acc + cur.amount, 0);
+  const totalPrice = selectInfo.reduce((acc, cur) => acc + cur.totalPrice, 0);
+  const pickOptions = selectInfo.filter((item) => !(item.id === productData.id && item.optionName === "original"));
+  const discountedPrice = productData.discountRate ? Math.floor((productData.price - productData.price * (productData.discountRate * 0.01)) / 1000) * 1000 : productData.price;
 
-  const onChangeHandler = (event) => {
-    setPickOptions((prev) => {
-      const value = event.target.value;
-      if (pickOptions.findIndex(({ optionName }) => optionName === value) === -1) {
-        const optionData = optionList.find(({ optionName }) => optionName === value);
-        return [...prev, optionData];
-      }
-      return prev;
-    });
-    setTotalAmount(() => {
-      const totalAmount = pickOptions.reduce((acc, cur) => acc + cur.amount, 0);
-      return totalAmount + amount;
-    });
+  const changeSelectOriginal = (prev) => {
+    const optionItem = prev.find((item) => item.id === productData.id && item.optionName === "original");
+    if (optionItem) {
+      optionItem.amount = amount;
+      optionItem.totalPrice = discountedPrice * amount;
+    }
+    return [...prev];
   };
 
-  const ToggleCartBtn = () => {
-    setToggle((prev) => !prev);
-    JSON.parse(localStorage.getItem("cartData"));
-    localStorage.setItem(
-      "cartData",
-      JSON.stringify([
-        {
-          id: productData.id,
-          productName: productData.productName,
-          cost: productData.price,
-          price: totalPrice,
-          shippingFee: productData.shippingFee,
-          discountRate: productData.discountRate,
-          thumbnailImg: productData.thumbnailImg,
-          couponData: productData.couponData,
-          amount: totalAmount,
-        },
-      ])
-    );
+  const removeSelectOriginal = (prev) => {
+    return [...prev.filter((item) => !(item.id === productData.id && item.optionName === "original"))];
   };
 
   useEffect(() => {
-    setTotalAmount(() => {
-      const totalAmount = pickOptions.reduce((acc, cur) => acc + cur.amount, 0);
-      return totalAmount + amount;
-    });
-
-    setTotalPrice(() => {
-      const totalPrice = pickOptions.reduce((acc, cur) => {
-        return acc + cur.price;
-      }, 0);
-
-      return amount * discountedPrice + productData.shippingFee + totalPrice;
-    });
-  }, [totalAmount]);
-
-  useEffect(() => {
-    setSelectInfo((prev) => {
-      const optionItem = prev.find((item) => item.id === productData.id && item.optionName === "original");
-      if (optionItem) {
-        optionItem.amount = amount;
-        optionItem.totalPrice = discountedPrice * amount + productData.shippingFee;
-      }
-      return [...prev];
-    });
+    setSelectInfo(changeSelectOriginal);
   }, [amount]);
 
   useEffect(() => {
@@ -215,36 +168,83 @@ const PurchaseInfo = ({ productData }) => {
         shippingFee: productData.shippingFee,
         discountRate: productData.discountRate,
         thumbnailImg: productData.thumbnailImg,
-        totalPrice: discountedPrice * amount + productData.shippingFee,
+        totalPrice: discountedPrice * amount,
         optionName: "original",
         couponData: [],
+        optionList: [],
         amount: 1,
       },
     ]);
   }, []);
-  useEffect(() => {
-    setTotalAmount(0);
 
-    setTotalPrice(discountedPrice + productData.shippingFee);
-  }, []);
+  const onChangeHandler = (event) => {
+    setSelectInfo(removeSelectOriginal); //오리지널 삭제
+
+    const option = productData.option.find((item) => item.optionName === event.target.value); //옵션리스트에서 벨류와 같은 옵션 객체 찾기
+
+    if (option) {
+      // 옵션이 있다면
+      const inSelect = selectInfo.find((item) => item.optionName === event.target.value); // 셀렉트인포에서 벨류와 같은 객체 찾기
+
+      if (!inSelect) {
+        // 셀렉트인포에 객체가 있다면
+
+        setSelectInfo((prev) => {
+          // 셀렉트인포에 객체 추가
+          return [
+            ...prev,
+            {
+              id: productData.id,
+              productName: productData.productName,
+              cost: productData.price + option.additionalFee,
+              price: discountedPrice + option.additionalFee,
+              shippingFee: productData.shippingFee,
+              discountRate: productData.discountRate,
+              thumbnailImg: productData.thumbnailImg,
+              totalPrice: discountedPrice + option.additionalFee,
+              optionName: option.optionName,
+              additionalFee: option.additionalFee,
+              couponData: [],
+              optionList: [],
+              amount: 1,
+            },
+          ];
+        });
+      }
+    }
+  };
+
+  const ToggleCartBtn = () => {
+    const prev = JSON.parse(localStorage.getItem("cartData"));
+    if (!toggle) {
+      prev.forEach((prevItem) => {
+        selectInfo.forEach((selectItem) => {
+          if (prevItem.id === selectItem.id) {
+            prevItem.amount += selectItem.amount;
+            prevItem.totalPrice += selectItem.totalPrice;
+          }
+        });
+      });
+      const filtedSelected = selectInfo.filter((selectItem) => !prev.find((prevItem) => prevItem.id === selectItem.id));
+
+      localStorage.setItem("cartData", JSON.stringify([...prev, ...filtedSelected]));
+    }
+    setToggle((prev) => !prev);
+  };
+
   const handleBuyBtn = () => {
     const prev = JSON.parse(localStorage.getItem("cartData"));
-    localStorage.setItem(
-      "cartData",
-      JSON.stringify([
-        ...prev,
-        {
-          id: productData.id,
-          productName: productData.productName,
-          price: totalPrice,
-          shippingFee: productData.shippingFee,
-          discountRate: productData.discountRate,
-          thumbnailImg: productData.thumbnailImg,
-          couponData: productData.couponData,
-          amount: totalAmount,
-        },
-      ])
-    );
+    prev.forEach((prevItem) => {
+      selectInfo.forEach((selectItem) => {
+        if (prevItem.id === selectItem.id) {
+          prevItem.amount += selectItem.amount;
+          prevItem.totalPrice += selectItem.totalPrice;
+        }
+      });
+    });
+    const filtedSelected = selectInfo.filter((selectItem) => !prev.find((prevItem) => prevItem.id === selectItem.id));
+
+    localStorage.setItem("cartData", JSON.stringify([...prev, ...filtedSelected]));
     navigate("/cartpage");
   };
   return (
@@ -261,19 +261,16 @@ const PurchaseInfo = ({ productData }) => {
             {!!productData.option.length ? (
               <>
                 <Selector onChangeHandler={onChangeHandler} optionData={productData.option} />
-                {pickOptions &&
-                  pickOptions.map((option, index) => (
-                    <Option key={index} option={option} productData={productData} setPickOptions={setPickOptions} setTotalAmount={setTotalAmount} />
-                  ))}
+                {pickOptions && pickOptions.map((option, index) => <Option key={index} option={option} productData={productData} />)}
               </>
             ) : (
-              <ChangeAmountBtn amount={amount} setAmount={setAmount} setTotalAmount={setTotalAmount} />
+              <ChangeAmountBtn amount={amount} setAmount={setAmount} />
             )}
             <Hr />
             <TotalProductPrice>
               <PriceLabel>총 상품 금액</PriceLabel>
               <TotalAmount>총 수량 {totalAmount === 0 ? 1 : totalAmount}개</TotalAmount>
-              <FinalPrice>{totalPrice.toLocaleString()}</FinalPrice>
+              <FinalPrice>{(totalPrice + productData.shippingFee).toLocaleString()}</FinalPrice>
             </TotalProductPrice>
             <InteractiveBtns>
               <BuyBtn onClick={handleBuyBtn}>바로 구매</BuyBtn>

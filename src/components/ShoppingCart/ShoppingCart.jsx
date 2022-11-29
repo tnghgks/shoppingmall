@@ -133,11 +133,17 @@ const AllCheckBox = styled.button`
   border: none;
   background-image: url(${(props) => (props.toggle ? checkBoxOn : checkBoxOff)});
 `;
+const EmptyCart = styled.div`
+  width: 100%;
+  height: 50px;
+  line-height: 100px;
+  text-align: center;
+`;
 
 const ShoppingCart = ({ appendSelected }) => {
   const cartData = JSON.parse(localStorage.getItem("cartData"));
   const [allSelected, setAllSelected] = useState(false);
-  const totalPrice = cartData.reduce((acc, cur) => acc + cur.price, 0);
+  const totalPrice = cartData.reduce((acc, cur) => acc + cur.totalPrice, 0);
   const totalCouponPrice = cartData.reduce((acc, cur) => acc + cur.shippingFee, 0);
   const deliveryFee = cartData.reduce((acc, cur) => acc + cur.shippingFee, 0);
   const ExpectedPrice = totalPrice - totalCouponPrice + deliveryFee;
@@ -157,7 +163,11 @@ const ShoppingCart = ({ appendSelected }) => {
         <ColumnName leftMargin="163px">주문금액</ColumnName>
       </Header>
       <PurchaseList>
-        {cartData && cartData.map((purchaseItem) => <PurchaseItem key={purchaseItem.id} purchaseItem={purchaseItem} allSelected={allSelected} appendSelected={appendSelected} />)}
+        {cartData.length ? (
+          cartData.map((purchaseItem) => <PurchaseItem key={purchaseItem.id} purchaseItem={purchaseItem} allSelected={allSelected} appendSelected={appendSelected} />)
+        ) : (
+          <EmptyCart>장바구니에 아무것도 없습니다.</EmptyCart>
+        )}
       </PurchaseList>
       <PriceInfo>
         <InfoItem leftMargin="112px">

@@ -31,11 +31,10 @@ const DiscountRate = styled.span`
 
 const ProductPrice = ({ productPrice, discountRate = 0 }) => {
   const cost = productPrice.toLocaleString();
-  const discountedPrice = discountRate ? Math.floor((productPrice - productPrice * (discountRate * 0.01)) / 1000) * 1000 : productPrice;
 
   return (
     <>
-      <Price>{discountedPrice.toLocaleString()}</Price>
+      <Price>{productPrice.toLocaleString()}</Price>
       {!!discountRate && (
         <>
           <Cost>{cost}</Cost>

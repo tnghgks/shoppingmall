@@ -38,13 +38,12 @@ const Price = styled.span`
 const DeleteBtn = styled.img`
   cursor: pointer;
 `;
-const Option = ({ option, productData, setPickOptions, setTotalAmount }) => {
-  const { selectInfo, setSelectInfo } = useContext(PurchaseContext);
+const Option = ({ option, productData }) => {
+  const { setSelectInfo } = useContext(PurchaseContext);
   const price = productData.price;
   const discountRate = productData.discountRate;
   const { additionalFee, optionName } = option;
   const finalPrice = discountRate ? Math.floor((price - price * (discountRate * 0.01)) / 1000) * 1000 + additionalFee : price + additionalFee;
-
   const [amount, setAmount] = useState(1);
   const [optionPrice, setOptionPrice] = useState(0);
 
@@ -55,9 +54,6 @@ const Option = ({ option, productData, setPickOptions, setTotalAmount }) => {
         prev.splice(optionItem, 1);
       }
       return [...prev];
-    });
-    setPickOptions((prev) => {
-      return [...prev.filter((item) => !(item.optionName === optionName))];
     });
   };
 
@@ -70,7 +66,6 @@ const Option = ({ option, productData, setPickOptions, setTotalAmount }) => {
       if (optionItem) {
         optionItem.amount = amount;
         optionItem.totalPrice = finalPrice * amount;
-        console.log(optionItem);
       }
       return [...prev];
     });
@@ -78,22 +73,6 @@ const Option = ({ option, productData, setPickOptions, setTotalAmount }) => {
 
   useEffect(() => {
     setOptionPrice(finalPrice);
-    setSelectInfo((prev) => [
-      ...prev,
-      {
-        id: productData.id,
-        productName: productData.productName,
-        cost: productData.price,
-        price: finalPrice,
-        shippingFee: productData.shippingFee,
-        discountRate: productData.discountRate,
-        thumbnailImg: productData.thumbnailImg,
-        totalPrice: finalPrice * amount,
-        optionName: option.optionName,
-        couponData: [],
-        amount: 1,
-      },
-    ]);
   }, []);
 
   return (
@@ -103,7 +82,7 @@ const Option = ({ option, productData, setPickOptions, setTotalAmount }) => {
         <DeleteBtn src={deleteIcon} onClick={handleDeleteBtn} />
       </Division>
       <Division>
-        <ChangeAmountBtn amount={amount} setAmount={setAmount} setTotalAmount={setTotalAmount} />
+        <ChangeAmountBtn amount={amount} setAmount={setAmount} />
         <Price>{optionPrice.toLocaleString()}</Price>
       </Division>
     </Container>

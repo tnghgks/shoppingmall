@@ -76,23 +76,24 @@ const PurchasePrice = styled.div`
   margin-left: 155px;
   color: #333333;
 `;
-const PurchaseItem = ({ purchaseItem: { id, productName, price, shippingFee, discountRate, thumbnailImg, couponData, amount = 1 }, allSelected, appendSelected }) => {
-  const finalPrice = amount * (Math.floor((price - price * (discountRate * 0.01)) / 1000) * 1000) + shippingFee;
+const PurchaseItem = ({ purchaseItem, allSelected, appendSelected }) => {
   return (
     <Container>
-      <IconCheckBox allSelected={allSelected} appendSelected={appendSelected} cartId={id} />
-      <ProductImage src={`https://test.api.weniv.co.kr/${thumbnailImg}`} />
+      <IconCheckBox allSelected={allSelected} appendSelected={appendSelected} cartId={purchaseItem.id} />
+      <ProductImage src={`https://test.api.weniv.co.kr/${purchaseItem.thumbnailImg}`} />
       <ProductInfo>
-        <ItemName>{productName}</ItemName>
-        <ItemPrice>{discountRate ? <ProductPrice productPrice={price} discountRate={discountRate} /> : `${finalPrice.toLocaleString()} 원`}</ItemPrice>
-        <ItemOption>수량 : {amount}</ItemOption>
+        <ItemName>{purchaseItem.productName}</ItemName>
+        <ItemPrice>
+          {purchaseItem.discountRate ? <ProductPrice productPrice={purchaseItem.price} discountRate={purchaseItem.discountRate} /> : `${purchaseItem.price.toLocaleString()} 원`}
+        </ItemPrice>
+        <ItemOption>수량 : {purchaseItem.amount}</ItemOption>
       </ProductInfo>
       <CouponDiscount>
-        <CouponName>{couponData ? couponData.name : "-"}</CouponName>
-        <CouponPrice>{couponData ? couponData.price : "-"}</CouponPrice>
+        <CouponName>{purchaseItem.couponData ? purchaseItem.couponData.name : "-"}</CouponName>
+        <CouponPrice>{purchaseItem.couponData ? purchaseItem.couponData.price : "-"}</CouponPrice>
       </CouponDiscount>
-      <DeliveryFee>{shippingFee ? `${shippingFee} 원` : "무료 배송"}</DeliveryFee>
-      <PurchasePrice>{`${(price + shippingFee).toLocaleString()} 원`}</PurchasePrice>
+      <DeliveryFee>{purchaseItem.shippingFee ? `${purchaseItem.shippingFee.toLocaleString()} 원` : "무료 배송"}</DeliveryFee>
+      <PurchasePrice>{`${(purchaseItem.totalPrice + purchaseItem.shippingFee).toLocaleString()} 원`}</PurchasePrice>
     </Container>
   );
 };

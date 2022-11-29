@@ -30,7 +30,9 @@ function App() {
   };
 
   if (!(isProductLoading && isCouponLoading)) {
-    localStorage.setItem("cartData", JSON.stringify(productData));
+    if (!localStorage.getItem("cartData")) {
+      localStorage.setItem("cartData", "[]");
+    }
   }
 
   return (
