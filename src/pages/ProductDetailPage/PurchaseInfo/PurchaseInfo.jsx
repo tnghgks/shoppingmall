@@ -121,6 +121,9 @@ const LikeBtn = styled.button`
   height: 60px;
   border: 1px solid #bdbdbd;
   background: #ffffff;
+  background-image: url(${(props) => (props.likeToggle ? IconHeartOn : IconHeart)});
+  background-position: center;
+  background-repeat: no-repeat;
   cursor: pointer;
   border-radius: 5px;
 `;
@@ -134,6 +137,7 @@ const PurchaseInfo = ({ productData }) => {
   const [selectInfo, setSelectInfo] = useState([]);
   const [amount, setAmount] = useState(1);
   const [toggle, setToggle] = useState(false);
+  const [likeToggle, setLikeToggle] = useState(false);
   const value = useMemo(() => ({ selectInfo, setSelectInfo }), [selectInfo]);
   const totalAmount = selectInfo.reduce((acc, cur) => acc + cur.amount, 0);
   const totalPrice = selectInfo.reduce((acc, cur) => acc + cur.totalPrice, 0);
@@ -247,6 +251,11 @@ const PurchaseInfo = ({ productData }) => {
     localStorage.setItem("cartData", JSON.stringify([...prev, ...filtedSelected]));
     navigate("/cartpage");
   };
+
+  const handleLikeBtn = () => {
+    setLikeToggle((prev) => !prev);
+    console.log(likeToggle);
+  };
   return (
     <PurchaseContext.Provider value={value}>
       <BuyProductContainer>
@@ -278,9 +287,7 @@ const PurchaseInfo = ({ productData }) => {
                 <img src={IconShoppingCart} alt="장바구니 버튼" />
               </AddToCartBtn>
               <ToggleCart toggle={toggle} setToggle={setToggle} />
-              <LikeBtn>
-                <img src={IconHeart} alt="좋아요 버튼" />
-              </LikeBtn>
+              <LikeBtn likeToggle={likeToggle} onClick={handleLikeBtn} />
             </InteractiveBtns>
           </>
         ) : (
@@ -292,9 +299,8 @@ const PurchaseInfo = ({ productData }) => {
               <AddToCartBtn soldout={true} disabled>
                 <img src={IconDisabledCart} alt="장바구니 버튼" />
               </AddToCartBtn>
-              <LikeBtn>
-                <img src={IconHeart} alt="좋아요 버튼" />
-              </LikeBtn>
+
+              <LikeBtn likeToggle={likeToggle} onClick={handleLikeBtn} />
             </InteractiveBtns>
           </>
         )}

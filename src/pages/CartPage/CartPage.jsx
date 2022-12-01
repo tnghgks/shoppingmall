@@ -67,6 +67,7 @@ const DeleteBtn = styled.button`
 const CartPage = ({ couponData }) => {
   const [selected, setSelected] = useState([]);
   const [coupon, setCoupon] = useState([]);
+
   const handleDeleteBtn = () => {
     console.log("딜리트");
   };

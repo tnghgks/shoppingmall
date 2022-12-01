@@ -5,6 +5,7 @@ import ProductName from "./ProductName/ProductName";
 import ProductPrice from "./ProductPrice/ProductPrice";
 import voidHeart from "../../assets/icon-heart.svg";
 import heart from "../../assets/icon-heart-on.svg";
+import { useState } from "react";
 
 const Container = styled.article`
   width: 380px;
@@ -25,6 +26,7 @@ const Like = styled.div`
   height: 16px;
   background-image: url(${(props) => (props.isLike ? heart : voidHeart)});
   background-size: 18px 16px;
+  cursor: pointer;
   background-repeat: no-repeat;
 `;
 
@@ -36,7 +38,11 @@ const PriceContainer = styled.div`
 `;
 
 const Card = ({ productData, couponData }) => {
-  const isLike = false;
+  const [isLike, setIsLike] = useState(false);
+
+  const handleLikeBtn = () => {
+    setIsLike((prev) => !prev);
+  };
 
   return (
     <Container>
@@ -52,7 +58,7 @@ const Card = ({ productData, couponData }) => {
             </PriceContainer>
           </Link>
         </ProductInfo>
-        <Like isLike={isLike} />
+        <Like isLike={isLike} onClick={handleLikeBtn} />
       </InfoContainer>
     </Container>
   );
